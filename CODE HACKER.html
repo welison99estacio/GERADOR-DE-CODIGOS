@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://betia.app/wp-content/uploads/2023/12/IA-FAVICON.png" sizes="32x32">
+    <link rel="icon" href="https://betia.app/wp-content/uploads/2023/12/IA-FAVICON.png" sizes="192x192">
+    <link rel="apple-touch-icon" href="https://betia.app/wp-content/uploads/2023/12/IA-FAVICON.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="js/script.js"></script>
+    <title>CODE HACKER</title>
+</head>
+
+<script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'G-NF09EVYJ1J');
+</script>
+
+
+<body class="center-container">
+    <div class="display">
+       
+        <h1 class="title" id="titleText">Clique para <span style="color: #8a0588;">Gerar</span> seu código</h1>
+        <label class="switch" id="toggleSwitch" onclick="toggleLoader()">
+            <input type="checkbox" class="input__check">
+            <span class="slider"></span>
+        </label>
+        <canvas id="animationCanvas"></canvas>
+        <!-- Canvas para a animação -->
+        <div class="overlay" id="overlay"></div>
+        <div class="loader" id="loader">
+            <div class="orbe" style="--index: 0"></div>
+            <div class="orbe" style="--index: 1"></div>
+            <div class="orbe" style="--index: 2"></div>
+            <div class="orbe" style="--index: 3"></div>
+            <div class="orbe" style="--index: 4"></div>
+        </div>
+        <div class="loadingText" id="loadingText">Gerando <span class="loadingDots">...</span></div>
+        <div class="display2">
+            <div class="successMessage" id="successMessage">Seu código é: <span id="generatedCode" style="color: #b51ab2;"></span></div>
+            <button class="btn" id="copyBtn" onclick="copyCode()" style="display: none;">COPIAR CÓDIGO</button>
+            <a href="https://betlionpro.com?aff=210" target="_blank" class="btn" id="watchBtn" onclick="showWatchButton()" style="display: none;">ACESSAR BETLIONPRO</a>
+        </div>
+        
+    </div>
+    <script>
+        let Chars = ["*", "X", "+", "-", "1", "0", "1", "0", "m"];
+        let Cells = [];
+        let tileSize = 16;
+        let dropspeed = 8;
+        let tiles = 119;
+        let x = 0;
+
+        // Função para iniciar a animação p5.js
+        function startP5Animation() {
+            new p5();
+        }
+
+        function setup() {
+            noStroke();
+            colorMode(HSB, 290, 200, 50, .1);
+            let canvas = createCanvas(window.innerWidth, window.innerHeight);
+            canvas.style('display', 'block');
+            for (let i = 0; i < tiles; i++) {
+                x += tileSize;
+                let y = round(random(height / dropspeed) * tileSize) - window.innerHeight;
+                let r = tileSize;
+                let h = random(100, 150);
+                let t = random(.8, 8);
+                let u = random(.3, .8);
+                Cells[i] = new Matrix(x, y, r, h, t, u);
+            }
+        }
+
+        function draw() {
+            background(100, 100, 0, .009);
+            for (let i = 0; i < tiles; i++) {
+                Cells[i].spread();
+                Cells[i].update();
+            }
+        }
+
+
+        function Matrix(isX, isY, myD, myHue, newX, newY) {
+            this.x = isX;
+            this.y = isY;
+            this.tS = newX;
+            this.tU = newY;
+            this.diameter = myD;
+            this.h = myHue;
+            this.spread = function() {
+                let tx = 0;
+                let ty = round(random(0, 2));
+                this.x += (tx * tileSize);
+                if ((this.x > width + (tileSize * 8)) || (this.x < -tileSize * 8)) {
+                    this.x = random(width / tileSize) * tileSize;
+                }
+                this.y += (ty * dropspeed);
+                if ((this.y > height + (tileSize * 8)) || (this.y < -tileSize * 8)) {
+                    this.y = random(-height / tileSize) * tileSize;
+                }
+
+                if ((this.y < ((window.innerHeight)))) this.y += this.tU;
+            }
+
+            this.update = function() {
+                let thecol = round(random(0, 10));
+                let thebri = 0;
+
+                if (thecol == 10) {
+                    thecol = 0;
+                    thebri = 100;
+                } else {
+                    myHue = 120;
+                    thecol = 100;
+                    thebri = 50;
+                }
+                fill(myHue, thecol, thebri, .7);
+                textSize(16);
+                textFont('Verdana');
+                let thechar = round(random(0, 8));
+                text((Chars[(thechar)]), this.x, this.y);
+            }
+        }
+
+        function copyCode() {
+            var code = document.getElementById("generatedCode").innerText;
+            navigator.clipboard.writeText(code).then(function() {
+                alert('Código copiado: ' + code);
+            }, function(err) {
+                alert('Erro ao copiar o código: ' + err);
+            });
+        }
+
+        function toggleLoader() {
+            var toggleSwitch = document.getElementById("toggleSwitch");
+            var switchInput = document.querySelector('.input__check');
+            var titleText = document.getElementById("titleText");
+            var loadingText = document.getElementById("loadingText");
+            var loader = document.getElementById("loader");
+
+            // Desativa o switch após o primeiro clique
+            toggleSwitch.onclick = null; // Remove o manipulador de evento de clique
+
+            // Oculta o texto inicial
+            titleText.style.display = "none";
+
+            // Mostra o loader e o texto de carregamento
+            loadingText.style.display = "block";
+            loader.style.display = "block";
+
+            if (switchInput.checked) {
+                startP5Animation(); // Inicia a animação p5.js
+
+                setTimeout(function() {
+                    var generatedCode = "#" + Math.random().toString(36).substr(2, 5).toUpperCase() + "*";
+                    document.getElementById("generatedCode").innerText = generatedCode;
+                    document.getElementById("successMessage").style.display = "block";
+                    loadingText.style.display = "none"; // Esconde a mensagem "Gerando"
+                    loader.style.display = "none"; // Esconde o loader
+                    document.getElementById("watchBtn").style.display = "block"; // Mostra o botão ACESSE AQUI
+                    document.getElementById("copyBtn").style.display = "block"; // Mostra o botão COPIAR CÓDIGO
+                    toggleSwitch.remove(); // Remove a div do switch completamente do DOM
+                }, 5000);
+            }
+        }
+
+
+        document.getElementById('toggleSwitch').addEventListener('click', toggleLoader);
+    </script>
+
+    <style>
+        canvas {
+            position: fixed;
+            /* Faz o canvas ficar fixo na tela */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            /* Garante que o canvas fique atrás de todo o conteúdo */
+            pointer-events: none;
+            /* Permite que cliques passem pelo canvas */
+            opacity: 0.18;
+            /* Ajusta a opacidade do canvas */
+        }
+    </style>
+
+</body>
+
+</html>
